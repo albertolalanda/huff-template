@@ -1,0 +1,33 @@
+#define function addTwo(uint256, uint256) view returns(uint256)
+
+#define macro MAIN() = takes(0) returns(0) {
+
+    // Get the function selector
+    0x00
+    calldataload
+    0xE0
+    shr
+
+    // Jump to the implementation of the ADD_TWO function if the calldata matches the function selector
+    __FUNC_SIG(addTwo) eq addTwo jumpi
+
+    addTwo:
+        ADD_TWO()
+}
+
+#define macro ADD_TWO() = takes(0) returns(0) {
+    0x00 calldataload     // [number1] // load first 32 bytes onto the stack - number 1
+    0x20 calldataload     // [number2, number1] // load second 32 bytes onto the stack - number 2
+    add                   // [number1+number2] // add number 1 and 2 and put the result onto the stack
+
+    0x00 mstore           // place [number1 + number2] in memory
+    0x20 0x00 return      // return the result 32 bytes in memory starting from byte 0
+}
+
+// Bytecode result
+// 600c8060093d393df35f35602035015f5260205ff3
+// 600c8060093d393df3 boiler plate constructor logic
+// 5f35602035015f5260205ff3 this can be tested on evm.codes
+// 6000356020350160005260206000f3 on the tutorial is this instead. 
+// This is because there is no push0 before the shangai fork. PUSH0 is '5f'. 
+// They had to do PUSH1 00 instead = '6000'
